@@ -1,35 +1,124 @@
-// Utility function to shuffle array
-export const shuffleArray = (array) => {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+import React, { useState, useEffect } from 'react';
+import HomeScreen from './components/HomeScreen';
+import WordGameScreen from './components/WordGameScreen';
+import PhonicsScreen from './components/PhonicsScreen';
+import SentencesScreen from './components/SentencesScreen';
+import StoriesScreen from './components/StoriesScreen';
+import { wordGameData } from './data/wordGameData';
+import { phonicsData } from './data/phonicsData';
+import { sentenceData } from './data/sentenceData';
+import { shuffleArray } from './utils/helpers';
+import './App.css';
+
+const App = () => {
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [currentActivity, setCurrentActivity] = useState('home');
+  const [celebrationActive, setCelebrationActive] = useState(false);
+  const [sadActive, setSadActive] = useState(false);
+
+  // Game state
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentPhonicsIndex, setCurrentPhonicsIndex] = useState(0);
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+  const [currentStoryScene, setCurrentStoryScene] = useState('start');
+  const [shuffledOptions, setShuffledOptions] = useState([]);
+  const [shuffledPhonics, setShuffledPhonics] = useState([]);
+  const [shuffledSentences, setShuffledSentences] = useState([]);
+  const [score, setScore] = useState(0);
+
+  // Initialize shuffled options when word changes
+  useEffect(() => {
+    const currentWord = wordGameData[currentLanguage][currentWordIndex];
+    if (currentWord) {
+      setShuffledOptions(shuffleArray(currentWord.options));
+    }
+  }, [currentWordIndex, currentLanguage]);
+
+  // Initialize shuffled phonics when language changes
+  useEffect(() => {
+    if (phonicsData[currentLanguage]) {
+      setShuffledPhonics(shuffleArray(phonicsData[currentLanguage]));
+      setCurrentPhonicsIndex(0);
+    }
+  }, [currentLanguage]);
+
+  // Initialize shuffled sentences when language changes
+  useEffect(() => {
+    if (sentenceData[currentLanguage]) {
+      setShuffledSentences(shuffleArray(sentenceData[currentLanguage]));
+      setCurrentSentenceIndex(0);
+    }
+  }, [currentLanguage]);
+
+  const playCorrectSound = () => {
+    setCelebrationActive(true);
+    setTimeout(() => setCelebrationActive(false), 2000);
+  };
+
+  const playSadSound = () => {
+    setSadActive(true);
+    setTimeout(() => setSadActive(false), 1500);
+  };
+
+  const handleWordGameAnswer = (selectedEmoji) => {
+    const currentWord = wordGameData[currentLanguage][currentWordIndex];
+    if (selectedEmoji === currentWord.correct) {
+      playCorrectSound();
+      setScore(score + 1);
+      setTimeout(() => {
+        const nextIndex = (currentWordIndex + 1) % wordGameData[currentLanguage].length;
+        setCurrentWordIndex(nextIndex);
+      }, 2000);
+    } else {
+      playSadSound();
+    }
+  };
+
+  const appProps = {
+    currentLanguage,
+    setCurrentLanguage,
+    currentActivity,
+    setCurrentActivity,
+    celebrationActive,
+    sadActive,
+    currentWordIndex,
+    setCurrentWordIndex,
+    currentPhonicsIndex,
+    setCurrentPhonicsIndex,
+    currentSentenceIndex,
+    setCurrentSentenceIndex,
+    currentStoryScene,
+    setCurrentStoryScene,
+    shuffledOptions,
+    shuffledPhonics,
+    shuffledSentences,
+    score,
+    setScore,
+    handleWordGameAnswer,
+    playCorrectSound,
+    playSadSound
+  };
+
+  const renderCurrentActivity = () => {
+    switch (currentActivity) {
+      case 'wordGame':
+        return <WordGameScreen {...appProps} />;
+      case 'phonics':
+        return <PhonicsScreen {...appProps} />;
+      case 'sentences':
+        return <SentencesScreen {...appProps} />;
+      case 'stories':
+        return <StoriesScreen {...appProps} />;
+      default:
+        return <HomeScreen {...appProps} />;
+    }
+  };
+
+  return (
+    <div className="font-kid-friendly select-none">
+      {renderCurrentActivity()}
+    </div>
+  );
 };
 
-// Text-to-speech utility functions
-export const speakText = (text, language = 'en') => {
-  if ('speechSynthesis' in window) {
-    // Remove emojis and clean text for better speech
-    const cleanText = text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-    
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
-    speechSynthesis.speak(utterance);
-  }
-};
-
-// Special function for phonics - speaks just the letter sound
-export const speakPhonicsLetter = (letter, language = 'en') => {
-  if ('speechSynthesis' in window) {
-    // Use lowercase to avoid "Capital" prefix
-    const pronounceableLetter = letter.toLowerCase();
-    
-    const utterance = new SpeechSynthesisUtterance(pronounceableLetter);
-    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
-    utterance.rate = 0.7; // Slower for phonics clarity
-    utterance.pitch = 1.1; // Slightly higher pitch for child-friendly sound
-    speechSynthesis.speak(utterance);
-  }
-};
+export default App;
