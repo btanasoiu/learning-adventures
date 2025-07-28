@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/learning-adventures/static/css/main.625426c6.css",
-    "main.js": "/learning-adventures/static/js/main.edeafa09.js",
+    "main.js": "/learning-adventures/static/js/main.ccdcfc38.js",
     "index.html": "/learning-adventures/index.html",
     "main.625426c6.css.map": "/learning-adventures/static/css/main.625426c6.css.map",
-    "main.edeafa09.js.map": "/learning-adventures/static/js/main.edeafa09.js.map"
+    "main.ccdcfc38.js.map": "/learning-adventures/static/js/main.ccdcfc38.js.map"
   },
   "entrypoints": [
     "static/css/main.625426c6.css",
-    "static/js/main.edeafa09.js"
+    "static/js/main.ccdcfc38.js"
   ]
 }
