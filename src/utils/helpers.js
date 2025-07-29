@@ -8,29 +8,121 @@ export const shuffleArray = (array) => {
   return shuffled;
 };
 
+// Get the correct language code for speech synthesis
+const getSpeechLanguage = (language) => {
+  const languageMap = {
+    'en': 'en-US',
+    'de': 'de-DE',
+    'ro': 'ro-RO'
+  };
+  return languageMap[language] || 'en-US';
+};
+
+// Find the best available voice for the language
+const findBestVoice = (language) => {
+  if (!('speechSynthesis' in window)) return null;
+  
+  const voices = speechSynthesis.getVoices();
+  const targetLang = getSpeechLanguage(language);
+  
+  // First try to find a voice that exactly matches the language
+  let voice = voices.find(v => v.lang === targetLang);
+  
+  // If not found, try to find a voice with the same language code (e.g., 'de' for German)
+  if (!voice) {
+    const langCode = language;
+    voice = voices.find(v => v.lang.startsWith(langCode));
+  }
+  
+  // If still not found, try common alternatives
+  if (!voice && language === 'ro') {
+    // Try alternative Romanian codes
+    voice = voices.find(v => v.lang.includes('ro') || v.lang.includes('RO'));
+  }
+  
+  if (!voice && language === 'de') {
+    // Try alternative German codes
+    voice = voices.find(v => v.lang.includes('de') || v.lang.includes('DE'));
+  }
+  
+  return voice;
+};
+
 // Text-to-speech utility functions
 export const speakText = (text, language = 'en') => {
   if ('speechSynthesis' in window) {
-    // Remove emojis and clean text for better speech
-    const cleanText = text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+    // Cancel any ongoing speech
+    speechSynthesis.cancel();
     
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
-    speechSynthesis.speak(utterance);
+    // Wait a moment for voices to load if they haven't already
+    const speak = () => {
+      // Remove emojis and clean text for better speech
+      const cleanText = text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+      
+      if (!cleanText) return;
+      
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      
+      // Set language
+      utterance.lang = getSpeechLanguage(language);
+      
+      // Try to find and set the best voice
+      const voice = findBestVoice(language);
+      if (voice) {
+        utterance.voice = voice;
+      }
+      
+      // Adjust speech parameters for better clarity
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 0.9;
+      
+      speechSynthesis.speak(utterance);
+    };
+    
+    // If voices aren't loaded yet, wait for them
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
+    } else {
+      speak();
+    }
   }
 };
 
 // Special function for phonics - speaks just the letter sound
 export const speakPhonicsLetter = (letter, language = 'en') => {
   if ('speechSynthesis' in window) {
-    // Use lowercase to avoid "Capital" prefix
-    const pronounceableLetter = letter.toLowerCase();
+    // Cancel any ongoing speech
+    speechSynthesis.cancel();
     
-    const utterance = new SpeechSynthesisUtterance(pronounceableLetter);
-    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
-    utterance.rate = 0.7; // Slower for phonics clarity
-    utterance.pitch = 1.1; // Slightly higher pitch for child-friendly sound
-    speechSynthesis.speak(utterance);
+    const speak = () => {
+      // Use lowercase to avoid "Capital" prefix
+      const pronounceableLetter = letter.toLowerCase();
+      
+      const utterance = new SpeechSynthesisUtterance(pronounceableLetter);
+      
+      // Set language
+      utterance.lang = getSpeechLanguage(language);
+      
+      // Try to find and set the best voice
+      const voice = findBestVoice(language);
+      if (voice) {
+        utterance.voice = voice;
+      }
+      
+      utterance.rate = 0.6; // Slower for phonics clarity
+      utterance.pitch = 1.1; // Slightly higher pitch for child-friendly sound
+      utterance.volume = 0.9;
+      
+      speechSynthesis.speak(utterance);
+    };
+    
+    // If voices aren't loaded yet, wait for them
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
+    } else {
+      speak();
+    }
   }
 };
 
@@ -152,5 +244,26 @@ export const enableAudio = () => {
   const context = initAudioContext();
   if (context && context.state === 'suspended') {
     context.resume();
+  }
+};
+
+// Debug function to check available voices (you can call this in console)
+export const debugVoices = () => {
+  if ('speechSynthesis' in window) {
+    const voices = speechSynthesis.getVoices();
+    console.log('Available voices:');
+    voices.forEach((voice, index) => {
+      console.log(`${index}: ${voice.name} (${voice.lang}) - ${voice.localService ? 'Local' : 'Remote'}`);
+    });
+    
+    console.log('\nGerman voices:');
+    voices.filter(v => v.lang.includes('de')).forEach(voice => {
+      console.log(`- ${voice.name} (${voice.lang})`);
+    });
+    
+    console.log('\nRomanian voices:');
+    voices.filter(v => v.lang.includes('ro')).forEach(voice => {
+      console.log(`- ${voice.name} (${voice.lang})`);
+    });
   }
 };
