@@ -2,41 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import child-friendly web fonts for better mobile support */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap');
+/* Import fonts with better international character support */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 body {
   margin: 0;
-  font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', cursive, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* Updated font stack with better Unicode support */
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* Better text rendering on mobile */
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  /* Ensure proper character encoding */
+  unicode-bidi: embed;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 
-/* Child-friendly font utilities */
+/* Child-friendly font utilities with better Unicode support */
 .font-kid-friendly {
-  font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif;
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', sans-serif;
   font-weight: 500;
+  /* Ensure proper rendering of diacritics */
+  font-feature-settings: "kern" 1, "liga" 1;
+  font-variant-ligatures: common-ligatures;
 }
 
 .font-kid-bold {
-  font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif;
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', sans-serif;
   font-weight: 600;
+  font-feature-settings: "kern" 1, "liga" 1;
+  font-variant-ligatures: common-ligatures;
 }
 
 .font-kid-extra-bold {
-  font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif;
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', sans-serif;
   font-weight: 700;
+  font-feature-settings: "kern" 1, "liga" 1;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* Special class for text with diacritics and special characters */
+.font-unicode {
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Noto Sans Display', 'Liberation Sans', 'DejaVu Sans', sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  font-variant-ligatures: common-ligatures contextual;
+  text-rendering: optimizeLegibility;
 }
 
 /* Mobile-optimized text sizes */
@@ -74,15 +89,17 @@ code {
 
 /* Ensure emojis render well on all devices */
 .emoji-text {
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', emoji;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Noto Emoji', 'EmojiOne Color', 'Android Emoji', 'Twemoji Mozilla', emoji, sans-serif;
   font-variant-emoji: unicode;
+  font-feature-settings: "liga" off;
 }
 
-/* Better button text rendering on mobile */
+/* Better button text rendering on mobile with Unicode support */
 button {
-  font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif;
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1;
 }
 
 /* Prevent text selection for better mobile experience */
@@ -100,5 +117,24 @@ button {
   button {
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* Specific support for Romanian and German characters */
+.font-romanian-german {
+  font-family: 'Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Calibri', 'Tahoma', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "dlig" 1;
+  font-variant-ligatures: common-ligatures contextual discretionary-ligatures;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fallback for older browsers */
+@supports not (font-feature-settings: "kern" 1) {
+  .font-kid-friendly,
+  .font-kid-bold,
+  .font-kid-extra-bold,
+  .font-unicode,
+  .font-romanian-german {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Arial', sans-serif;
   }
 }

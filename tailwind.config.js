@@ -6,10 +6,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'kid-friendly': ['Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', 'cursive', 'sans-serif'],
-        'kid-bold': ['Fredoka', 'Quicksand', 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', 'cursive', 'sans-serif'],
-        'comic-sans': ['Comic Sans MS', 'Comic Neue', 'Chalkboard SE', 'Marker Felt', 'cursive', 'sans-serif'],
-        'emoji': ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'emoji'],
+        'kid-friendly': ['Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', 'sans-serif'],
+        'kid-bold': ['Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', 'sans-serif'],
+        'unicode': ['Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial Unicode MS', 'Noto Sans', 'Noto Sans Display', 'Liberation Sans', 'DejaVu Sans', 'sans-serif'],
+        'romanian-german': ['Nunito', 'Poppins', 'Inter', 'Segoe UI', 'Calibri', 'Tahoma', 'Arial Unicode MS', 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', 'sans-serif'],
+        'emoji': ['Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Noto Emoji', 'EmojiOne Color', 'Android Emoji', 'Twemoji Mozilla', 'emoji', 'sans-serif'],
       },
       fontSize: {
         'mobile-xs': ['0.75rem', { lineHeight: '1rem' }],

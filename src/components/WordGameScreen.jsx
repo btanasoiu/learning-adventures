@@ -16,29 +16,34 @@ const WordGameScreen = ({
   const t = translations[currentLanguage];
   const currentWord = wordGameData[currentLanguage][currentWordIndex];
   
+  // Use special font class for Romanian and German
+  const textFontClass = (currentLanguage === 'ro' || currentLanguage === 'de')
+    ? 'font-romanian-german'
+    : 'font-kid-friendly';
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 p-4 sm:p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6 sm:mb-8 gap-4">
           <button
             onClick={() => setCurrentActivity('home')}
-            className="bg-white text-green-600 px-4 py-2 sm:px-6 sm:py-3 rounded-full font-kid-bold text-sm sm:text-base shadow-lg hover:bg-gray-100 flex items-center gap-2 min-h-[44px]"
+            className={`bg-white text-green-600 px-4 py-2 sm:px-6 sm:py-3 rounded-full font-kid-bold text-sm sm:text-base shadow-lg hover:bg-gray-100 flex items-center gap-2 min-h-[44px] ${textFontClass}`}
           >
             <Home size={16} className="sm:size-5" />
             <span className="hidden xs:inline">{t.backToMenu}</span>
             <span className="xs:hidden">Back</span>
           </button>
-          <div className="bg-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-kid-bold text-green-600 shadow-lg text-sm sm:text-base">
+          <div className={`bg-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-kid-bold text-green-600 shadow-lg text-sm sm:text-base ${textFontClass}`}>
             Score: {score} <span className="emoji-text">⭐</span>
           </div>
         </div>
 
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
           <div className="mb-6 sm:mb-8">
-            <div className="text-4xl sm:text-5xl md:text-6xl font-kid-extra-bold text-green-600 mb-3 sm:mb-4 leading-tight">
+            <div className={`text-4xl sm:text-5xl md:text-6xl font-kid-extra-bold text-green-600 mb-3 sm:mb-4 leading-tight ${textFontClass}`}>
               {currentWord.word}
             </div>
-            <div className="text-2xl sm:text-3xl md:text-4xl font-kid-bold text-blue-600 leading-tight">
+            <div className={`text-2xl sm:text-3xl md:text-4xl font-kid-bold text-blue-600 leading-tight ${textFontClass}`}>
               {currentWord.lowercase}
             </div>
           </div>
@@ -59,7 +64,7 @@ const WordGameScreen = ({
 
       {celebrationActive && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
-          <div className="text-4xl sm:text-5xl md:text-6xl animate-bounce font-kid-extra-bold text-center px-4">
+          <div className={`text-4xl sm:text-5xl md:text-6xl animate-bounce font-kid-extra-bold text-center px-4 ${textFontClass}`}>
             <span className="emoji-text">🎉</span> {t.correct} <span className="emoji-text">🎉</span>
           </div>
           <div className="absolute inset-0 animate-pulse">
@@ -82,7 +87,7 @@ const WordGameScreen = ({
 
       {sadActive && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
-          <div className="text-2xl sm:text-3xl md:text-4xl animate-pulse bg-white px-6 py-4 rounded-2xl shadow-lg font-kid-bold mx-4 text-center">
+          <div className={`text-2xl sm:text-3xl md:text-4xl animate-pulse bg-white px-6 py-4 rounded-2xl shadow-lg font-kid-bold mx-4 text-center ${textFontClass}`}>
             {t.incorrect}
           </div>
         </div>
