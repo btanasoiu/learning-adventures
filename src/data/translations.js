@@ -12,7 +12,11 @@ export const translations = {
     nextWord: "Next Word",
     playSound: "Play Sound",
     readStory: "Read Story",
-    backToMenu: "Back to Menu"
+    backToMenu: "Back to Menu",
+    allStories: "All Stories",
+    restartStory: "Restart Story",
+    chooseStory: "Choose a Story",
+    adventureInProgress: "Adventure in progress..."
   },
   de: {
     title: "Lernabenteuer",
@@ -27,7 +31,11 @@ export const translations = {
     nextWord: "Nächstes Wort",
     playSound: "Ton abspielen",
     readStory: "Geschichte lesen",
-    backToMenu: "Zurück zum Menü"
+    backToMenu: "Zurück zum Menü",
+    allStories: "Alle Geschichten",
+    restartStory: "Geschichte neu starten",
+    chooseStory: "Wähle eine Geschichte",
+    adventureInProgress: "Abenteuer läuft..."
   },
   ro: {
     title: "Aventuri de Învățare",
@@ -42,6 +50,10 @@ export const translations = {
     nextWord: "Următorul Cuvânt",
     playSound: "Redă Sunetul",
     readStory: "Citește Povestea",
-    backToMenu: "Înapoi la Meniu"
+    backToMenu: "Înapoi la Meniu",
+    allStories: "Toate Poveștile",
+    restartStory: "Restart Poveste",
+    chooseStory: "Alege o Poveste",
+    adventureInProgress: "Aventura continuă..."
   }
 };

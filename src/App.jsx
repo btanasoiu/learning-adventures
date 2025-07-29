@@ -20,7 +20,11 @@ const App = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentPhonicsIndex, setCurrentPhonicsIndex] = useState(0);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+  
+  // Story state - updated for multiple stories
+  const [currentStoryId, setCurrentStoryId] = useState(null);
   const [currentStoryScene, setCurrentStoryScene] = useState('start');
+  
   const [shuffledOptions, setShuffledOptions] = useState([]);
   const [shuffledPhonics, setShuffledPhonics] = useState([]);
   const [shuffledSentences, setShuffledSentences] = useState([]);
@@ -48,6 +52,12 @@ const App = () => {
       setShuffledSentences(shuffleArray(sentenceData[currentLanguage]));
       setCurrentSentenceIndex(0);
     }
+  }, [currentLanguage]);
+
+  // Reset story state when language changes
+  useEffect(() => {
+    setCurrentStoryId(null);
+    setCurrentStoryScene('start');
   }, [currentLanguage]);
 
   const playCorrectSound = () => {
@@ -87,6 +97,9 @@ const App = () => {
     setCurrentPhonicsIndex,
     currentSentenceIndex,
     setCurrentSentenceIndex,
+    // Updated story props
+    currentStoryId,
+    setCurrentStoryId,
     currentStoryScene,
     setCurrentStoryScene,
     shuffledOptions,
