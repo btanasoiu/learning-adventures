@@ -8,143 +8,149 @@ export const shuffleArray = (array) => {
   return shuffled;
 };
 
-// Helper function to get the best available voice for a language
-const getBestVoice = (language) => {
-  if (!('speechSynthesis' in window)) return null;
-  
-  const voices = speechSynthesis.getVoices();
-  
-  // Language mappings with multiple fallbacks
-  const languageMappings = {
-    'en': ['en-US', 'en-GB', 'en-AU', 'en-CA', 'en'],
-    'de': ['de-DE', 'de-AT', 'de-CH', 'de'],
-    'ro': ['ro-RO', 'ro']
-  };
-  
-  const preferredLanguages = languageMappings[language] || ['en-US', 'en'];
-  
-  // Try to find a voice for each preferred language in order
-  for (const lang of preferredLanguages) {
-    const voice = voices.find(voice =>
-      voice.lang.toLowerCase().startsWith(lang.toLowerCase())
-    );
-    if (voice) return voice;
-  }
-  
-  // Fallback to default voice
-  return voices.find(voice => voice.default) || voices[0] || null;
-};
-
-// Wait for voices to be loaded
-const ensureVoicesLoaded = () => {
-  return new Promise((resolve) => {
-    if (speechSynthesis.getVoices().length > 0) {
-      resolve();
-    } else {
-      speechSynthesis.addEventListener('voiceschanged', () => {
-        resolve();
-      }, { once: true });
-      
-      // Fallback timeout in case voiceschanged doesn't fire
-      setTimeout(resolve, 1000);
-    }
-  });
-};
-
 // Text-to-speech utility functions
-export const speakText = async (text, language = 'en') => {
-  if (!('speechSynthesis' in window)) {
-    console.warn('Speech synthesis not supported');
-    return;
-  }
-
-  try {
-    // Cancel any ongoing speech
-    speechSynthesis.cancel();
-    
-    // Wait for voices to be loaded
-    await ensureVoicesLoaded();
-    
+export const speakText = (text, language = 'en') => {
+  if ('speechSynthesis' in window) {
     // Remove emojis and clean text for better speech
     const cleanText = text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
     
-    if (!cleanText) return;
-    
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    const voice = getBestVoice(language);
-    
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    } else {
-      // Fallback language codes
-      const langCodes = {
-        'en': 'en-US',
-        'de': 'de-DE',
-        'ro': 'ro-RO'
-      };
-      utterance.lang = langCodes[language] || 'en-US';
-    }
-    
-    utterance.rate = 0.8;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    
-    // Add error handling
-    utterance.onerror = (event) => {
-      console.warn('Speech synthesis error:', event.error);
-    };
-    
+    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
     speechSynthesis.speak(utterance);
-  } catch (error) {
-    console.warn('Error in speakText:', error);
   }
 };
 
 // Special function for phonics - speaks just the letter sound
-export const speakPhonicsLetter = async (letter, language = 'en') => {
-  if (!('speechSynthesis' in window)) {
-    console.warn('Speech synthesis not supported');
-    return;
-  }
-
-  try {
-    // Cancel any ongoing speech
-    speechSynthesis.cancel();
-    
-    // Wait for voices to be loaded
-    await ensureVoicesLoaded();
-    
+export const speakPhonicsLetter = (letter, language = 'en') => {
+  if ('speechSynthesis' in window) {
     // Use lowercase to avoid "Capital" prefix
     const pronounceableLetter = letter.toLowerCase();
     
     const utterance = new SpeechSynthesisUtterance(pronounceableLetter);
-    const voice = getBestVoice(language);
-    
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    } else {
-      // Fallback language codes
-      const langCodes = {
-        'en': 'en-US',
-        'de': 'de-DE',
-        'ro': 'ro-RO'
-      };
-      utterance.lang = langCodes[language] || 'en-US';
-    }
-    
-    utterance.rate = 0.6; // Slower for phonics clarity
+    utterance.lang = language === 'en' ? 'en-US' : language === 'de' ? 'de-DE' : 'ro-RO';
+    utterance.rate = 0.7; // Slower for phonics clarity
     utterance.pitch = 1.1; // Slightly higher pitch for child-friendly sound
-    utterance.volume = 1.0;
-    
-    // Add error handling
-    utterance.onerror = (event) => {
-      console.warn('Speech synthesis error:', event.error);
-    };
-    
     speechSynthesis.speak(utterance);
-  } catch (error) {
-    console.warn('Error in speakPhonicsLetter:', error);
+  }
+};
+
+// Audio context for sound effects
+let audioContext = null;
+
+// Initialize audio context (needed for modern browsers)
+const initAudioContext = () => {
+  if (!audioContext) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.log('Web Audio API not supported');
+      return null;
+    }
+  }
+  return audioContext;
+};
+
+// Create a beep sound with specific frequency and duration
+const createBeep = (frequency, duration, volume = 0.3) => {
+  const context = initAudioContext();
+  if (!context) return;
+
+  const oscillator = context.createOscillator();
+  const gainNode = context.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(context.destination);
+  
+  oscillator.frequency.value = frequency;
+  oscillator.type = 'sine';
+  
+  gainNode.gain.setValueAtTime(0, context.currentTime);
+  gainNode.gain.linearRampToValueAtTime(volume, context.currentTime + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + duration);
+  
+  oscillator.start(context.currentTime);
+  oscillator.stop(context.currentTime + duration);
+};
+
+// Create a multi-tone celebration sound
+const playCelebrationBeep = () => {
+  const context = initAudioContext();
+  if (!context) return;
+
+  // Play a happy ascending melody
+  const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 - happy major chord
+  notes.forEach((freq, index) => {
+    setTimeout(() => {
+      createBeep(freq, 0.2, 0.2);
+    }, index * 100);
+  });
+  
+  // Add some sparkle with higher notes
+  setTimeout(() => {
+    createBeep(1046.5, 0.3, 0.15); // C6
+  }, 400);
+};
+
+// Create a gentle sad sound
+const playSadBeep = () => {
+  const context = initAudioContext();
+  if (!context) return;
+
+  // Play a gentle descending tone
+  const notes = [440, 392, 349.23]; // A4, G4, F4 - gentle descending
+  notes.forEach((freq, index) => {
+    setTimeout(() => {
+      createBeep(freq, 0.3, 0.15);
+    }, index * 150);
+  });
+};
+
+// Enhanced celebration sound with speech
+export const playCorrectSound = (language = 'en') => {
+  // Play the beep sound effect
+  playCelebrationBeep();
+  
+  // Also speak encouragement
+  const encouragements = {
+    en: ['Great job!', 'Excellent!', 'Well done!', 'Amazing!', 'Perfect!'],
+    de: ['Gut gemacht!', 'Ausgezeichnet!', 'Sehr gut!', 'Fantastisch!', 'Perfekt!'],
+    ro: ['Bravo!', 'Excelent!', 'Foarte bine!', 'Minunat!', 'Perfect!']
+  };
+  
+  const phrases = encouragements[language] || encouragements.en;
+  const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+  
+  // Delay speech slightly so it doesn't interfere with beep
+  setTimeout(() => {
+    speakText(randomPhrase, language);
+  }, 500);
+};
+
+// Enhanced sad sound with gentle speech
+export const playSadSound = (language = 'en') => {
+  // Play the gentle sad beep
+  playSadBeep();
+  
+  // Speak gentle encouragement
+  const encouragements = {
+    en: ['Try again!', 'You can do it!', 'Almost there!', 'Keep trying!'],
+    de: ['Versuche es nochmal!', 'Du schaffst das!', 'Fast geschafft!', 'Weiter so!'],
+    ro: ['Încearcă din nou!', 'Poți să reușești!', 'Aproape!', 'Continuă să încerci!']
+  };
+  
+  const phrases = encouragements[language] || encouragements.en;
+  const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+  
+  // Delay speech slightly
+  setTimeout(() => {
+    speakText(randomPhrase, language);
+  }, 600);
+};
+
+// Function to enable audio context on user interaction (required by browsers)
+export const enableAudio = () => {
+  const context = initAudioContext();
+  if (context && context.state === 'suspended') {
+    context.resume();
   }
 };

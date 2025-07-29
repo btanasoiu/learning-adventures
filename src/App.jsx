@@ -7,7 +7,7 @@ import StoriesScreen from './components/StoriesScreen';
 import { wordGameData } from './data/wordGameData';
 import { phonicsData } from './data/phonicsData';
 import { sentenceData } from './data/sentenceData';
-import { shuffleArray } from './utils/helpers';
+import { shuffleArray, playCorrectSound, playSadSound, enableAudio } from './utils/helpers';
 import './App.css';
 
 const App = () => {
@@ -60,27 +60,46 @@ const App = () => {
     setCurrentStoryScene('start');
   }, [currentLanguage]);
 
-  const playCorrectSound = () => {
+  // Enable audio context on first interaction
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      enableAudio();
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+    
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+    
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, []);
+
+  const playCorrectSoundEffect = () => {
     setCelebrationActive(true);
+    playCorrectSound(currentLanguage);
     setTimeout(() => setCelebrationActive(false), 2000);
   };
 
-  const playSadSound = () => {
+  const playSadSoundEffect = () => {
     setSadActive(true);
+    playSadSound(currentLanguage);
     setTimeout(() => setSadActive(false), 1500);
   };
 
   const handleWordGameAnswer = (selectedEmoji) => {
     const currentWord = wordGameData[currentLanguage][currentWordIndex];
     if (selectedEmoji === currentWord.correct) {
-      playCorrectSound();
+      playCorrectSoundEffect();
       setScore(score + 1);
       setTimeout(() => {
         const nextIndex = (currentWordIndex + 1) % wordGameData[currentLanguage].length;
         setCurrentWordIndex(nextIndex);
       }, 2000);
     } else {
-      playSadSound();
+      playSadSoundEffect();
     }
   };
 
@@ -97,7 +116,7 @@ const App = () => {
     setCurrentPhonicsIndex,
     currentSentenceIndex,
     setCurrentSentenceIndex,
-    // Updated story props
+    // Story props - updated for multiple stories
     currentStoryId,
     setCurrentStoryId,
     currentStoryScene,
@@ -108,8 +127,8 @@ const App = () => {
     score,
     setScore,
     handleWordGameAnswer,
-    playCorrectSound,
-    playSadSound
+    playCorrectSound: playCorrectSoundEffect,
+    playSadSound: playSadSoundEffect
   };
 
   const renderCurrentActivity = () => {
